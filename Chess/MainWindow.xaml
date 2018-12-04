@@ -4,73 +4,10 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Chess"
+        xmlns:usercontrols="clr-namespace:Chess.UserControls"
         mc:Ignorable="d"
         Title="MainWindow" Height="500" Width="475">
-    <StackPanel Name="MainContent" Margin="10">
-        <StackPanel Orientation="Vertical">
-            <StackPanel Orientation="Horizontal" Margin="20,0,0,0">
-                <Label Width="50" Height="20" Content="A" Padding="0" Margin="0" HorizontalContentAlignment="Center"/>
-                <Label Width="50" Height="20" Content="B" Padding="0" Margin="0" HorizontalContentAlignment="Center"/>
-                <Label Width="50" Height="20" Content="C" Padding="0" Margin="0" HorizontalContentAlignment="Center"/>
-                <Label Width="50" Height="20" Content="D" Padding="0" Margin="0" HorizontalContentAlignment="Center"/>
-                <Label Width="50" Height="20" Content="E" Padding="0" Margin="0" HorizontalContentAlignment="Center"/>
-                <Label Width="50" Height="20" Content="F" Padding="0" Margin="0" HorizontalContentAlignment="Center"/>
-                <Label Width="50" Height="20" Content="G" Padding="0" Margin="0" HorizontalContentAlignment="Center"/>
-                <Label Width="50" Height="20" Content="H" Padding="0" Margin="0" HorizontalContentAlignment="Center"/>
-            </StackPanel>
-            <StackPanel Orientation="Horizontal">
-                <StackPanel Orientation="Vertical">
-                    <Label Content="8" Width="20" Height="50" Margin="0" Padding="0" VerticalContentAlignment="Center"/>
-                    <Label Content="6" Width="20" Height="50" Margin="0" Padding="0" VerticalContentAlignment="Center"/>
-                    <Label Content="7" Width="20" Height="50" Margin="0" Padding="0" VerticalContentAlignment="Center"/>
-                    <Label Content="5" Width="20" Height="50" Margin="0" Padding="0" VerticalContentAlignment="Center"/>
-                    <Label Content="4" Width="20" Height="50" Margin="0" Padding="0" VerticalContentAlignment="Center"/>
-                    <Label Content="3" Width="20" Height="50" Margin="0" Padding="0" VerticalContentAlignment="Center"/>
-                    <Label Content="2" Width="20" Height="50" Margin="0" Padding="0" VerticalContentAlignment="Center"/>
-                    <Label Content="1" Width="20" Height="50" Margin="0" Padding="0" VerticalContentAlignment="Center"/>
-                </StackPanel>
-                <Grid>
-                    <Rectangle Width="400" Height="400" Stroke="Black" StrokeThickness="1" MouseMove="MouseHover">
-                        <Rectangle.Fill>
-                            <DrawingBrush Viewport="0,0,0.25,0.25" TileMode="Tile">
-                                <DrawingBrush.Drawing>
-                                    <GeometryDrawing Brush="Gray">
-                                        <GeometryDrawing.Geometry>
-                                            <GeometryGroup>
-                                                <RectangleGeometry Rect="50,25,25,25" />
-                                                <RectangleGeometry Rect="25,50,25,25" />
-                                            </GeometryGroup>
-                                        </GeometryDrawing.Geometry>
-                                    </GeometryDrawing>
-                                </DrawingBrush.Drawing>
-                            </DrawingBrush>
-                        </Rectangle.Fill>
-                    </Rectangle>
-                    <Grid Name="ChessboardGrid">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="50"/>
-                            <ColumnDefinition Width="50"/>
-                            <ColumnDefinition Width="50"/>
-                            <ColumnDefinition Width="50"/>
-                            <ColumnDefinition Width="50"/>
-                            <ColumnDefinition Width="50"/>
-                            <ColumnDefinition Width="50"/>
-                            <ColumnDefinition Width="50"/>
-                        </Grid.ColumnDefinitions>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="50"/>
-                            <RowDefinition Height="50"/>
-                            <RowDefinition Height="50"/>
-                            <RowDefinition Height="50"/>
-                            <RowDefinition Height="50"/>
-                            <RowDefinition Height="50"/>
-                            <RowDefinition Height="50"/>
-                            <RowDefinition Height="50"/>
-                        </Grid.RowDefinitions>
-                    </Grid>
-                </Grid>
-            </StackPanel>
-        </StackPanel>
-        <Label Name="Coordinate"/>
-    </StackPanel>
+    <Grid Name="MainContent" Margin="10">
+        <usercontrols:Chessboard />
+    </Grid>
 </Window>
