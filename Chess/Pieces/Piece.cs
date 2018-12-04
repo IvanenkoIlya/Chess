@@ -18,5 +18,10 @@ namespace Chess.Pieces
         }
 
         public abstract List<Coord> MovePositions();
+
+        public override string ToString()
+        {
+            return (Color ? "Black" : "White") + $" {GetType().Name} at " + Position.ToString();
+        }
     }
 }

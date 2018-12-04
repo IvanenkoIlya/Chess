@@ -63,10 +63,10 @@ namespace Chess.UserControls
         {
             if(Piece != null)
             {
-                foreach (Coord movePos in Piece.MovePositions())
-                {
-                    // TODO highlight movable spaces
-                }
+                //foreach (Coord movePos in Piece.MovePositions())
+                //{
+                //    // TODO highlight movable spaces
+                //}
             }
         }
 

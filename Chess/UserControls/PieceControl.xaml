@@ -6,7 +6,7 @@
              xmlns:local="clr-namespace:Chess.UserControls"
              mc:Ignorable="d" 
              d:DesignHeight="50" d:DesignWidth="50">
-    <Grid Margin="0" MouseDown="ShowMoves" MouseUp="ClearMoves">
+    <Grid Margin="0">
         <Image Name="PieceImage" Margin="0"/>
     </Grid>
 </UserControl>

@@ -2,8 +2,10 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shapes;
 
@@ -38,11 +40,12 @@ namespace Chess.UserControls
         }
         #endregion
 
-        private List<Piece> pieces;
+        private List<Piece> _pieces;
+        private PieceControl _lastClicked;
         
         public Chessboard()
         {
-            pieces = new List<Piece>();
+            _pieces = new List<Piece>();
             DataContext = this;
             InitializeComponent();
             InitializePieces();
@@ -50,36 +53,92 @@ namespace Chess.UserControls
 
         private void InitializePieces()
         {
-            pieces.Clear();
+            _pieces.Clear();
 
-            pieces.Add(new Rook(1, 1, false));
-            pieces.Add(new Knight(1, 2, false));
-            pieces.Add(new Bishop(1, 3, false));
-            pieces.Add(new Queen(1, 4, false));
-            pieces.Add(new King(1, 5, false));
-            pieces.Add(new Bishop(1, 6, false));
-            pieces.Add(new Knight(1, 7, false));
-            pieces.Add(new Rook(1, 8, false));
+            _pieces.Add(new Rook(1, 1, false));
+            _pieces.Add(new Knight(1, 2, false));
+            _pieces.Add(new Bishop(1, 3, false));
+            _pieces.Add(new Queen(1, 4, false));
+            _pieces.Add(new King(1, 5, false));
+            _pieces.Add(new Bishop(1, 6, false));
+            _pieces.Add(new Knight(1, 7, false));
+            _pieces.Add(new Rook(1, 8, false));
 
             for (int i = 1; i <= 8; i++)
             {
-                pieces.Add(new Pawn(2, i, false));
-                pieces.Add(new Pawn(7, i, true));
+                _pieces.Add(new Pawn(2, i, false));
+                _pieces.Add(new Pawn(7, i, true));
             }
 
-            pieces.Add(new Rook(8, 1, true));
-            pieces.Add(new Knight(8, 2, true));
-            pieces.Add(new Bishop(8, 3, true));
-            pieces.Add(new Queen(8, 4, true));
-            pieces.Add(new King(8, 5, true));
-            pieces.Add(new Bishop(8, 6, true));
-            pieces.Add(new Knight(8, 7, true));
-            pieces.Add(new Rook(8, 8, true));
+            _pieces.Add(new Rook(8, 1, true));
+            _pieces.Add(new Knight(8, 2, true));
+            _pieces.Add(new Bishop(8, 3, true));
+            _pieces.Add(new Queen(8, 4, true));
+            _pieces.Add(new King(8, 5, true));
+            _pieces.Add(new Bishop(8, 6, true));
+            _pieces.Add(new Knight(8, 7, true));
+            _pieces.Add(new Rook(8, 8, true));
 
-            foreach(Piece p in pieces)
+            foreach(Piece p in _pieces)
             {
-                Pieces.Children.Add(new PieceControl() { Piece = p });
+                PieceControl pc = new PieceControl() { Piece = p };
+                pc.MouseDown += Click_ShowPieceMoves;
+
+                Pieces.Children.Add(pc);
             }
+        }
+
+        private void Click_ShowPieceMoves(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            _lastClicked = ((PieceControl)sender);
+
+
+            Overlay.Children.Clear();
+            foreach(Coord c in _lastClicked.Piece.MovePositions())
+            {
+                // This works for Knight, Pawns, and Kings
+                // Does not check sightlines for Queen, Rook, or Bishop
+                if (_pieces.Any(x => x.Position == c)) 
+                    continue;
+
+                Rectangle rect = new Rectangle()
+                {
+                    Fill = Brushes.Green,
+                    Opacity = 0.5
+                };
+                rect.MouseDown += Click_MovePiece;
+
+                Point pos = CoordinateToGridPoint(c);
+
+                rect.SetValue(Grid.RowProperty, (int)pos.Y);
+                rect.SetValue(Grid.ColumnProperty, (int)pos.X);
+
+                Overlay.Children.Add(rect);
+            }
+        }
+
+        private void Click_MovePiece(object sender, MouseButtonEventArgs e)
+        {
+            Rectangle rect = (Rectangle)sender;
+            int row = (int)rect.GetValue(Grid.RowProperty);
+            int column = (int)rect.GetValue(Grid.ColumnProperty);
+
+            _lastClicked.Piece.Position = GridPointToCoordinate(new Point(column, row));
+            _lastClicked.SetValue(Grid.RowProperty, row);
+            _lastClicked.SetValue(Grid.ColumnProperty, column);
+
+            _lastClicked = null;
+            Overlay.Children.Clear();
+        }
+
+        private Coord GridPointToCoordinate(Point p)
+        {
+            return new Coord(8 - ((int)p.Y),((int)p.X) + 1);
+        }
+
+        private Point CoordinateToGridPoint(Coord c)
+        {
+            return new Point(c.Column - 1, 8 - c.Row);
         }
 
         private Coord BoardPointToCoordinate(Point p)
