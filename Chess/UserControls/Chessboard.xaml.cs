@@ -108,6 +108,9 @@ namespace Chess.UserControls
                 };
                 rect.MouseDown += Click_MovePiece;
 
+                //if (_pieces.Any(x => x.Position == c && x.Color != _lastClicked.Piece.Color))
+                //    rect.Fill = Brushes.Red;
+
                 Point pos = CoordinateToGridPoint(c);
 
                 rect.SetValue(Grid.RowProperty, (int)pos.Y);
