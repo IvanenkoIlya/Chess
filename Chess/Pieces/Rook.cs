@@ -1,14 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace Chess.Pieces
 {
     public class Rook : Piece
     {
-        public Rook(int row, int col, bool color) : base(row, col, color) { }
+        public bool HasMoved
+
+        public Rook(int row, int col, bool color) : base(row, col, color)
+        {
+            HasMoved = false;
+        }
 
         // TODO Blocking not taken into account
         public override List<Coord> MovePositions()

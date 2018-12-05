@@ -209,19 +209,10 @@ namespace Chess.UserControls
             Overlay.Children.Clear();
         }
 
-        private Coord GridPointToCoordinate(Point p)
+        private void ClearOverlay(object sender, MouseButtonEventArgs e)
         {
-            return new Coord(8 - ((int)p.Y), ((int)p.X) + 1);
-        }
-
-        private Point CoordinateToGridPoint(Coord c)
-        {
-            return new Point(c.Column - 1, 8 - c.Row);
-        }
-
-        private Coord BoardPointToCoordinate(Point p)
-        {
-            return new Coord(((399 - (int)p.Y) / 50) + 1, ((int)p.X / 50) + 1);
+            if (!e.Handled)
+                Overlay.Children.Clear();
         }
 
         private void MouseHover(object sender, System.Windows.Input.MouseEventArgs e)
@@ -243,6 +234,21 @@ namespace Chess.UserControls
             Coordinates.Content = "";
         }
 
+        private Coord GridPointToCoordinate(Point p)
+        {
+            return new Coord(8 - ((int)p.Y), ((int)p.X) + 1);
+        }
+
+        private Point CoordinateToGridPoint(Coord c)
+        {
+            return new Point(c.Column - 1, 8 - c.Row);
+        }
+
+        private Coord BoardPointToCoordinate(Point p)
+        {
+            return new Coord(((399 - (int)p.Y) / 50) + 1, ((int)p.X / 50) + 1);
+        }
+
         #region INotifyPropertyChanged implementation
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -251,11 +257,5 @@ namespace Chess.UserControls
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(property));
         }
         #endregion
-
-        private void ClearOverlay(object sender, MouseButtonEventArgs e)
-        {
-            if (!e.Handled)
-                Overlay.Children.Clear();
-        }
     }
 }
