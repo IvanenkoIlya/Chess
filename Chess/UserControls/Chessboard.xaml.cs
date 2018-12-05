@@ -40,12 +40,12 @@ namespace Chess.UserControls
         }
         #endregion
 
-        private List<Piece> _pieces;
+        private List<PieceControl> _pieces;
         private PieceControl _lastClicked;
-        
+
         public Chessboard()
         {
-            _pieces = new List<Piece>();
+            _pieces = new List<PieceControl>();
             DataContext = this;
             InitializeComponent();
             InitializePieces();
@@ -55,36 +55,35 @@ namespace Chess.UserControls
         {
             _pieces.Clear();
 
-            _pieces.Add(new Rook(1, 1, false));
-            _pieces.Add(new Knight(1, 2, false));
-            _pieces.Add(new Bishop(1, 3, false));
-            _pieces.Add(new Queen(1, 4, false));
-            _pieces.Add(new King(1, 5, false));
-            _pieces.Add(new Bishop(1, 6, false));
-            _pieces.Add(new Knight(1, 7, false));
-            _pieces.Add(new Rook(1, 8, false));
+            _pieces.Add(new PieceControl() { Piece = new Rook(1, 1, false) });
+            _pieces.Add(new PieceControl() { Piece = new Knight(1, 2, false) });
+            _pieces.Add(new PieceControl() { Piece = new Bishop(1, 3, false) });
+            _pieces.Add(new PieceControl() { Piece = new Queen(1, 4, false) });
+            _pieces.Add(new PieceControl() { Piece = new King(1, 5, false) });
+            _pieces.Add(new PieceControl() { Piece = new Bishop(1, 6, false) });
+            _pieces.Add(new PieceControl() { Piece = new Knight(1, 7, false) });
+            _pieces.Add(new PieceControl() { Piece = new Rook(1, 8, false) });
 
             for (int i = 1; i <= 8; i++)
             {
-                _pieces.Add(new Pawn(2, i, false));
-                _pieces.Add(new Pawn(7, i, true));
+                _pieces.Add(new PieceControl() { Piece = new Pawn(2, i, false) });
+                _pieces.Add(new PieceControl() { Piece = new Pawn(7, i, true) });
             }
 
-            _pieces.Add(new Rook(8, 1, true));
-            _pieces.Add(new Knight(8, 2, true));
-            _pieces.Add(new Bishop(8, 3, true));
-            _pieces.Add(new Queen(8, 4, true));
-            _pieces.Add(new King(8, 5, true));
-            _pieces.Add(new Bishop(8, 6, true));
-            _pieces.Add(new Knight(8, 7, true));
-            _pieces.Add(new Rook(8, 8, true));
+            _pieces.Add(new PieceControl() { Piece = new Rook(8, 1, true) });
+            _pieces.Add(new PieceControl() { Piece = new Knight(8, 2, true) });
+            _pieces.Add(new PieceControl() { Piece = new Bishop(8, 3, true) });
+            _pieces.Add(new PieceControl() { Piece = new Queen(8, 4, true) });
+            _pieces.Add(new PieceControl() { Piece = new King(8, 5, true) });
+            _pieces.Add(new PieceControl() { Piece = new Bishop(8, 6, true) });
+            _pieces.Add(new PieceControl() { Piece = new Knight(8, 7, true) });
+            _pieces.Add(new PieceControl() { Piece = new Rook(8, 8, true) });
 
-            foreach(Piece p in _pieces)
+            foreach (PieceControl p in _pieces)
             {
-                PieceControl pc = new PieceControl() { Piece = p };
-                pc.MouseDown += Click_ShowPieceMoves;
+                p.MouseDown += Click_ShowPieceMoves;
 
-                Pieces.Children.Add(pc);
+                Pieces.Children.Add(p);
             }
         }
 
@@ -92,15 +91,70 @@ namespace Chess.UserControls
         {
             _lastClicked = ((PieceControl)sender);
 
-
             Overlay.Children.Clear();
-            foreach(Coord c in _lastClicked.Piece.MovePositions())
-            {
-                // This works for Knight, Pawns, and Kings
-                // Does not check sightlines for Queen, Rook, or Bishop
-                if (_pieces.Any(x => x.Position == c)) 
-                    continue;
 
+            List<Coord> movePositions = _lastClicked.Piece.MovePositions();
+            List<Piece> blockingPieces = new List<Piece>();
+
+            foreach (Coord c in movePositions)
+                blockingPieces.AddRange(_pieces.Where(x => x.Piece.Position == c).Select(x => x.Piece));
+
+            foreach (Piece pc in blockingPieces)
+            {
+                // Remove vertical blocked spaces
+                if (pc.Position.Column == _lastClicked.Piece.Position.Column) 
+                {
+                    // remove all move positions above pc
+                    if (pc.Position.Row > _lastClicked.Piece.Position.Row)
+                        movePositions.RemoveAll(x => x.Row > pc.Position.Row && x.Column == pc.Position.Column);
+                    // remove all move positions bellow pc
+                    else if (pc.Position.Row < _lastClicked.Piece.Position.Row)
+                        movePositions.RemoveAll(x => x.Row < pc.Position.Row && x.Column == pc.Position.Column);
+                }
+                // Remove horizontal blocked spaces
+                else if (pc.Position.Row == _lastClicked.Piece.Position.Row)
+                {
+                    // Remove possitions right of pc
+                    if (pc.Position.Column > _lastClicked.Piece.Position.Column)
+                        movePositions.RemoveAll(x => x.Row == pc.Position.Row && x.Column > pc.Position.Column);
+                    // Remove positions left of pc
+                    else if (pc.Position.Column < _lastClicked.Piece.Position.Column)
+                        movePositions.RemoveAll(x => x.Row == pc.Position.Row && x.Column < pc.Position.Column);
+                }
+                // Remove all diagonal blocked spaces
+                else if (Math.Abs(pc.Position.Row - _lastClicked.Piece.Position.Row) == Math.Abs(pc.Position.Column - _lastClicked.Piece.Position.Column))
+                {
+                    if( pc.Position.Row > _lastClicked.Piece.Position.Row)
+                    {
+                        // Top Right
+                        if(pc.Position.Column > _lastClicked.Piece.Position.Column) 
+                        {
+                            movePositions.RemoveAll(x => x.Row > pc.Position.Row && x.Column > pc.Position.Column);
+                        }
+                        // Top Left
+                        else if(pc.Position.Column < _lastClicked.Piece.Position.Column)
+                        {
+                            movePositions.RemoveAll(x => x.Row > pc.Position.Row && x.Column < pc.Position.Column);
+                        }
+                    }
+                    else if(pc.Position.Row < _lastClicked.Piece.Position.Row)
+                    {
+                        // Bottom Right
+                        if (pc.Position.Column > _lastClicked.Piece.Position.Column)
+                        {
+                            movePositions.RemoveAll(x => x.Row < pc.Position.Row && x.Column > pc.Position.Column);
+                        }
+                        // Bottom Left
+                        else if (pc.Position.Column < _lastClicked.Piece.Position.Column)
+                        {
+                            movePositions.RemoveAll(x => x.Row < pc.Position.Row && x.Column < pc.Position.Column);
+                        }
+                    }
+                }
+            }
+
+            foreach (Coord c in movePositions)
+            {
                 Rectangle rect = new Rectangle()
                 {
                     Fill = Brushes.Green,
@@ -108,8 +162,18 @@ namespace Chess.UserControls
                 };
                 rect.MouseDown += Click_MovePiece;
 
-                //if (_pieces.Any(x => x.Position == c && x.Color != _lastClicked.Piece.Color))
-                //    rect.Fill = Brushes.Red;
+                PieceControl pc = _pieces.Where(x => x.Piece.Position == c).FirstOrDefault();
+
+                if (pc != null)
+                {
+                    if (pc.Piece.Color != _lastClicked.Piece.Color)
+                        rect.Fill = Brushes.Red;
+                    else
+                        continue;
+                }
+
+                if (_pieces.Any(x => x.Piece.Position == c && x.Piece.Color != _lastClicked.Piece.Color))
+                    rect.Fill = Brushes.Red;
 
                 Point pos = CoordinateToGridPoint(c);
 
@@ -118,6 +182,8 @@ namespace Chess.UserControls
 
                 Overlay.Children.Add(rect);
             }
+
+            e.Handled = true;
         }
 
         private void Click_MovePiece(object sender, MouseButtonEventArgs e)
@@ -126,7 +192,16 @@ namespace Chess.UserControls
             int row = (int)rect.GetValue(Grid.RowProperty);
             int column = (int)rect.GetValue(Grid.ColumnProperty);
 
-            _lastClicked.Piece.Position = GridPointToCoordinate(new Point(column, row));
+            Coord pos = GridPointToCoordinate(new Point(column, row));
+
+            PieceControl p = _pieces.Where(x => x.Piece.Position == pos && _lastClicked.Piece.Color != x.Piece.Color).FirstOrDefault();
+            if (p != null) // TODO This doesn't remove the PieceControl from the Chessboard
+            {
+                Pieces.Children.Remove(p);
+                _pieces.Remove(p);
+            }
+
+            _lastClicked.Piece.Position = pos;
             _lastClicked.SetValue(Grid.RowProperty, row);
             _lastClicked.SetValue(Grid.ColumnProperty, column);
 
@@ -136,7 +211,7 @@ namespace Chess.UserControls
 
         private Coord GridPointToCoordinate(Point p)
         {
-            return new Coord(8 - ((int)p.Y),((int)p.X) + 1);
+            return new Coord(8 - ((int)p.Y), ((int)p.X) + 1);
         }
 
         private Point CoordinateToGridPoint(Coord c)
@@ -176,5 +251,11 @@ namespace Chess.UserControls
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(property));
         }
         #endregion
+
+        private void ClearOverlay(object sender, MouseButtonEventArgs e)
+        {
+            if (!e.Handled)
+                Overlay.Children.Clear();
+        }
     }
 }

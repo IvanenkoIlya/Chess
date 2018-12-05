@@ -57,7 +57,7 @@
                    HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
         </StackPanel>
 
-        <Grid Width="400" Height="400" Grid.Row="1" Grid.Column="1" MouseMove="MouseHover" MouseLeave="MouseExitBoard">
+        <Grid Width="400" Height="400" Grid.Row="1" Grid.Column="1" MouseMove="MouseHover" MouseLeave="MouseExitBoard" MouseDown="ClearOverlay">
             <Rectangle Width="400" Height="400" Fill="{Binding WhiteColor}"/>
             <Rectangle Width="400" Height="400" Stroke="{Binding BlackColor}" StrokeThickness="1">
                 <Rectangle.Fill>
