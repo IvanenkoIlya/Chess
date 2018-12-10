@@ -1,4 +1,5 @@
-﻿using Chess.Pieces;
+﻿using Chess.Model;
+using Chess.Pieces;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -40,51 +41,17 @@ namespace Chess.UserControls
         }
         #endregion
 
+        private ChessboardModel chessboard;
+
         private List<PieceControl> _pieces;
         private PieceControl _lastClicked;
 
         public Chessboard()
         {
-            _pieces = new List<PieceControl>();
+            chessboard = new ChessboardModel();
+            
             DataContext = this;
             InitializeComponent();
-            InitializePieces();
-        }
-
-        private void InitializePieces()
-        {
-            _pieces.Clear();
-
-            _pieces.Add(new PieceControl() { Piece = new Rook(1, 1, false) });
-            _pieces.Add(new PieceControl() { Piece = new Knight(1, 2, false) });
-            _pieces.Add(new PieceControl() { Piece = new Bishop(1, 3, false) });
-            _pieces.Add(new PieceControl() { Piece = new Queen(1, 4, false) });
-            _pieces.Add(new PieceControl() { Piece = new King(1, 5, false) });
-            _pieces.Add(new PieceControl() { Piece = new Bishop(1, 6, false) });
-            _pieces.Add(new PieceControl() { Piece = new Knight(1, 7, false) });
-            _pieces.Add(new PieceControl() { Piece = new Rook(1, 8, false) });
-
-            for (int i = 1; i <= 8; i++)
-            {
-                _pieces.Add(new PieceControl() { Piece = new Pawn(2, i, false) });
-                _pieces.Add(new PieceControl() { Piece = new Pawn(7, i, true) });
-            }
-
-            _pieces.Add(new PieceControl() { Piece = new Rook(8, 1, true) });
-            _pieces.Add(new PieceControl() { Piece = new Knight(8, 2, true) });
-            _pieces.Add(new PieceControl() { Piece = new Bishop(8, 3, true) });
-            _pieces.Add(new PieceControl() { Piece = new Queen(8, 4, true) });
-            _pieces.Add(new PieceControl() { Piece = new King(8, 5, true) });
-            _pieces.Add(new PieceControl() { Piece = new Bishop(8, 6, true) });
-            _pieces.Add(new PieceControl() { Piece = new Knight(8, 7, true) });
-            _pieces.Add(new PieceControl() { Piece = new Rook(8, 8, true) });
-
-            foreach (PieceControl p in _pieces)
-            {
-                p.MouseDown += Click_ShowPieceMoves;
-
-                Pieces.Children.Add(p);
-            }
         }
 
         private void Click_ShowPieceMoves(object sender, System.Windows.Input.MouseButtonEventArgs e)
@@ -153,6 +120,76 @@ namespace Chess.UserControls
                 }
             }
 
+            // Casteling
+            // TODO Need to see if King is in check 
+            if(_lastClicked.Piece is King && !((King)_lastClicked.Piece).HasMoved)
+            {
+                var temp = _pieces.Where(x => x.Piece.Position == _lastClicked.Piece.Position + new Point(1, 0) ||
+                                 x.Piece.Position == _lastClicked.Piece.Position + new Point(2, 0));
+
+                if (!temp.Any())
+                {
+                    var rook = _pieces.Where(x => x.Piece.Position == _lastClicked.Piece.Position + new Point(3, 0)).FirstOrDefault();
+                    if (rook.Piece is Rook && !((Rook)rook.Piece).HasMoved)
+                    {
+                        Rectangle rect = new Rectangle()
+                        {
+                            Fill = Brushes.Yellow,
+                            Opacity = 0.5
+                        };
+                        rect.MouseDown += Click_Castle;
+
+                        rect.SetValue(Grid.RowProperty,_lastClicked.GetValue(Grid.RowProperty));
+                        rect.SetValue(Grid.ColumnProperty,(int)_lastClicked.GetValue(Grid.ColumnProperty) + 2);
+
+                        Overlay.Children.Add(rect);
+                    }
+                }
+            }
+
+            // Pawn attack
+            if(_lastClicked.Piece is Pawn)
+            {
+                if(_lastClicked.Piece.Color)
+                {
+                    // check bottom right and bottom left
+                    foreach(PieceControl p in _pieces.Where(x => !x.Piece.Color && 
+                        (x.Piece.Position == _lastClicked.Piece.Position + new Point(-1,-1) || x.Piece.Position == _lastClicked.Piece.Position + new Point(1, -1))))
+                    {
+                        Rectangle rect = new Rectangle()
+                        {
+                            Fill = Brushes.Red,
+                            Opacity = 0.5
+                        };
+                        rect.MouseDown += Click_MovePiece;
+
+                        rect.SetValue(Grid.RowProperty, p.GetValue(Grid.RowProperty));
+                        rect.SetValue(Grid.ColumnProperty, p.GetValue(Grid.ColumnProperty));
+
+                        Overlay.Children.Add(rect);
+                    }
+                }
+                else
+                {
+                    //check top right and top left
+                    foreach (PieceControl p in _pieces.Where(x => x.Piece.Color &&
+                         (x.Piece.Position == _lastClicked.Piece.Position + new Point(-1, 1) || x.Piece.Position == _lastClicked.Piece.Position + new Point(1, 1))))
+                    {
+                        Rectangle rect = new Rectangle()
+                        {
+                            Fill = Brushes.Red,
+                            Opacity = 0.5
+                        };
+                        rect.MouseDown += Click_MovePiece;
+
+                        rect.SetValue(Grid.RowProperty, p.GetValue(Grid.RowProperty));
+                        rect.SetValue(Grid.ColumnProperty, p.GetValue(Grid.ColumnProperty));
+
+                        Overlay.Children.Add(rect);
+                    }
+                }
+            }
+
             foreach (Coord c in movePositions)
             {
                 Rectangle rect = new Rectangle()
@@ -184,6 +221,11 @@ namespace Chess.UserControls
             }
 
             e.Handled = true;
+        }
+
+        private void Click_Castle(object sender, MouseButtonEventArgs e)
+        {
+            throw new NotImplementedException();
         }
 
         private void Click_MovePiece(object sender, MouseButtonEventArgs e)

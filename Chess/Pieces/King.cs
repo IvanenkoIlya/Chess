@@ -19,7 +19,7 @@ namespace Chess.Pieces
             new Point(-1,1)
         };
 
-        public King(int row, int col, bool color) : base(row, col, color)
+        public King(int row, int col, PieceColor color) : base(row, col, color)
         {
             HasMoved = false;
         }
@@ -32,20 +32,20 @@ namespace Chess.Pieces
         // Steps to castling:
         //      1) Move King 2 spaces toward Rook
         //      2) Hop Rook over King
-        public override List<Coord> MovePositions()
+        public override List<Movement> MovePositions(Piece[,] board)
         {
-            List<Coord> positions = new List<Coord>();
+            List<Movement> positions = new List<Movement>();
 
-            foreach(Point p in offsets)
-            {
-                int row = Position.Row + (int)p.Y;
-                int col = Position.Column + (int)p.X;
+            //foreach(Point p in offsets)
+            //{
+            //    int row = Position.Row + (int)p.Y;
+            //    int col = Position.Column + (int)p.X;
 
-                if (row < 1 || row > 8 || col < 1 || col > 8)
-                    continue;
+            //    if (row < 1 || row > 8 || col < 1 || col > 8)
+            //        continue;
 
-                positions.Add(new Coord(row, col));
-            }
+            //    positions.Add(new Coord(row, col));
+            //}
 
             return positions;
         }

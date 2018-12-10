@@ -17,22 +17,22 @@ namespace Chess.Pieces
             new Point(-2,1)
         };
 
-        public Knight(int row, int col, bool color) : base(row, col, color) { }
+        public Knight(int row, int col, PieceColor color) : base(row, col, color) { }
 
-        public override List<Coord> MovePositions()
+        public override List<Movement> MovePositions(Piece[,] board)
         {
-            List<Coord> positions = new List<Coord>();
+            List<Movement> positions = new List<Movement>();
 
-            foreach(Point p in offsets)
-            {
-                int row = Position.Row + (int)p.Y;
-                int col = Position.Column + (int)p.X;
+            //foreach(Point p in offsets)
+            //{
+            //    int row = Position.Row + (int)p.Y;
+            //    int col = Position.Column + (int)p.X;
 
-                if (row < 1 || row > 8 || col < 1 || col > 8)
-                    continue;
+            //    if (row < 1 || row > 8 || col < 1 || col > 8)
+            //        continue;
 
-                positions.Add(new Coord(row, col));
-            }
+            //    positions.Add(new Coord(row, col));
+            //}
 
             return positions;
         }

@@ -4,22 +4,53 @@ namespace Chess.Pieces
 {
     public class Bishop : Piece
     {
-        public Bishop(int row, int col, bool color) : base(row, col, color) { }
+        public Bishop(int row, int col, PieceColor color) : base(row, col, color) { }
 
-        public override List<Coord> MovePositions()
+        public override List<Movement> MovePositions(Piece[,] board)
         {
-            List<Coord> positions = new List<Coord>();
+            List<Movement> positions = new List<Movement>();
 
-            for (int i = 1; i < 8; i++)
+            int rowIndex = Position.Row - 1;
+            int colIndex = Position.Column - 1;
+
+            bool continueTopLeft = true;
+            bool continueTopRight = true;
+            bool continueBottomRight = true;
+            bool continueBottomLeft = true;
+
+            for(int i = 1; i < 8; i++)
             {
-                if (Position.Row + i <= 8 && Position.Column + i <= 8)
-                    positions.Add(new Coord(Position.Row + i, Position.Column + i));
-                if (Position.Row - i > 0 && Position.Column + i <= 8)
-                    positions.Add(new Coord(Position.Row - i, Position.Column + i));
-                if (Position.Row + i <= 8 && Position.Column - i > 0)
-                    positions.Add(new Coord(Position.Row + i, Position.Column - i));
-                if (Position.Row - i > 0 && Position.Column - i > 0)
-                    positions.Add(new Coord(Position.Row - i, Position.Column - i));
+                if (continueTopLeft)
+                {
+                    if (rowIndex + i + i < 8 && colIndex - i >= 0)
+                        continueTopLeft = GetMovement(rowIndex + i, colIndex - i, board[rowIndex + i, colIndex - i], positions);
+                    else
+                        continueTopLeft = false;
+                }
+
+                if (continueTopRight)
+                {
+                    if (rowIndex + i < 8 && colIndex + i < 8)
+                        continueTopRight = GetMovement(rowIndex + i, colIndex + i, board[rowIndex + i, colIndex + i], positions);
+                    else
+                        continueTopRight = false;
+                }
+
+                if(continueBottomRight)
+                {
+                    if (rowIndex - i >= 0 && colIndex + i < 8)
+                        continueBottomRight = GetMovement(rowIndex - i, colIndex + i, board[rowIndex - i, colIndex + i], positions);
+                    else
+                        continueBottomRight = false;
+                }
+
+                if (continueBottomLeft)
+                {
+                    if (rowIndex - i >= 0 && colIndex - i >= 0)
+                        continueBottomLeft = GetMovement(rowIndex - i, colIndex - i, board[rowIndex - i, colIndex - i], positions);
+                    else
+                        continueBottomLeft = false;
+                }
             }
 
             return positions;

@@ -7,7 +7,7 @@ namespace Chess.Pieces
     {
         private bool _firstMove;
 
-        public Pawn(int row, int col, bool color) : base(row, col, color)
+        public Pawn(int row, int col, PieceColor color) : base(row, col, color)
         {
             _firstMove = true;
         }
@@ -20,30 +20,30 @@ namespace Chess.Pieces
         // Your Pawn moves diagonally behind the opponents Pawn and captures it
 
         // TODO Need to take promotion into account
-        public override List<Coord> MovePositions()
+        public override List<Movement> MovePositions(Piece[,] board)
         {
-            List<Coord> positions = new List<Coord>();
+            List<Movement> positions = new List<Movement>();
 
-            if (Color)
-            {
-                if(Position.Row != 8)
-                    positions.Add(Position + new Point(0, -1));
-                if (_firstMove)
-                {
-                    positions.Add(Position + new Point(0, -2));
-                    _firstMove = false;
-                }
-            }
-            else
-            {
-                if (Position.Row != 1)
-                    positions.Add(Position + new Point(0, 1));
-                if (_firstMove)
-                {
-                    positions.Add(Position + new Point(0, 2));
-                    _firstMove = false;
-                }
-            }
+            //if (Color)
+            //{
+            //    if(Position.Row != 8)
+            //        positions.Add(Position + new Point(0, -1));
+            //    if (_firstMove)
+            //    {
+            //        positions.Add(Position + new Point(0, -2));
+            //        _firstMove = false;
+            //    }
+            //}
+            //else
+            //{
+            //    if (Position.Row != 1)
+            //        positions.Add(Position + new Point(0, 1));
+            //    if (_firstMove)
+            //    {
+            //        positions.Add(Position + new Point(0, 2));
+            //        _firstMove = false;
+            //    }
+            //}
 
             return positions;
         }
